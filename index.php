@@ -2,7 +2,7 @@
 
 //! --- Composer Autoload
 require_once __DIR__ . '/vendor/autoload.php';
-if(!session_id ()) {
+if (!session_id ()) {
     session_start ();
 }
 
@@ -21,8 +21,8 @@ use Facebook\Exceptions\FacebookResponseException;
 use Facebook\Exceptions\FacebookSDKException;
 
 $fb = new FB ([
-	'app_id' => '195429631005813',
-	'app_secret' => '4318699737d5c0d26acefecea85c5083',
+	'app_id' => 'APP_ID',
+	'app_secret' => 'APP_SECRET',
 	'default_graph_version' => 'v2.10',
 ]);
 $helper = $fb->getRedirectLoginHelper ();
