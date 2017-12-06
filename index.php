@@ -31,16 +31,22 @@ if (isset ($_GET['state'])) {
 }
 
 //! --- Routes
+
+//! Index
 $app->get('/', function (Request $req, Response $res) {
 	return $this->view->render ($res, 'index.html');
 });
 
+//! --- Facebook
+
+//! Request OAuth2 URI
 $app->get('/auth', function (Request $req, Response $res) use ($helper) {
 	$permissions = ['email', 'manage_pages', 'pages_show_list'];
 	$loginUrl = $helper->getLoginUrl ($req->getUri ()->getBaseUrl () . '/auth/callback', $permissions);
 	return $res->withRedirect ($loginUrl);
 });
 
+//! OAuth2 Callback
 $app->get('/auth/callback', function (Request $req, Response $res) use ($fb, $helper) {
 	try {
 		$accessToken = $helper->getAccessToken ();
@@ -90,6 +96,7 @@ $app->get('/auth/callback', function (Request $req, Response $res) use ($fb, $he
 	return $res->withRedirect ('/me');
 });
 
+//! Middleware, Login
 $fbLogin = function (Request $req, Response $res, $next) use ($fb) {
 	try {
 		$response = $fb->get('/me', $_SESSION ['fb_access_token']);
@@ -116,6 +123,7 @@ $fbLogin = function (Request $req, Response $res, $next) use ($fb) {
 	return $next($req, $res);
 };
 
+//! Self User
 $app->get('/me', function (Request $req, Response $res) use ($fb) {
 	$user = $fb->get ('/me', $_SESSION ['fb_access_token']);
 
@@ -126,6 +134,7 @@ $app->get('/me', function (Request $req, Response $res) use ($fb) {
 	return $res->withJson($data);
 })->add ($fbLogin);
 
+//! List of Pages from Self User
 $app->get('/pages', function (Request $req, Response $res) use ($fb) {
 	$user = $fb->get ('/me?fields=accounts', $_SESSION ['fb_access_token']);
 	$data = [
@@ -135,6 +144,7 @@ $app->get('/pages', function (Request $req, Response $res) use ($fb) {
 	return $res->withJson($data);
 })->add ($fbLogin);
 
+//! Data from ID Page
 $app->get('/page/{page_id}', function (Request $req, Response $res, $i) use ($fb) {
 	$user = $fb->get ("/{$i['page_id']}", $_SESSION ['fb_access_token']);
 	$data = [
